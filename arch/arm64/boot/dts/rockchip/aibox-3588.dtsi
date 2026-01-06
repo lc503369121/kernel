@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * 向成 XC3588S 全接口修复版设备树 (适配无 Type-C 底板)
  */
  
 #define rk3588
@@ -11,7 +10,6 @@
 #define TYPEC_OTG_20 0    /*1 = OTG , 0 = HOST */
 
 / {
-    /* 修正 LED：适配向成底板 GPIO0 布局 */
     firefly_leds: leds {
         pinctrl-names = "default";
         pinctrl-0 = <&leds_gpio>;
@@ -39,7 +37,6 @@
     };
 };
 
-/* --- USB 与 Type-C 逻辑修正 --- */
 #if TYPEC_OTG_20
 &vbus5v0_typec_pwr_en {
     status = "okay";
@@ -55,13 +52,21 @@
 };
 #endif
 
-/* 强制锁定 USB 3.0 为 Host 模式 (解决无 Type-C 识别问题) */
 &usbdrd_dwc3_0 {
     status = "okay";
-    dr_mode = "host"; 
+    dr_mode = "otg"; 
+    extcon = <&u2phy0>; 
 };
 
-/* 移除不存在的 Type-C 管理逻辑 */
+&u2phy0 {
+    status = "okay";
+};
+
+&u2phy0_otg {
+    status = "okay";
+    phy-supply = <&vcc5v0_host>; 
+};
+
 /delete-node/ &usbc0;
 /delete-node/ &usbc0_int;
 
@@ -74,7 +79,6 @@
    status = "okay";
 }; 
 
-/* --- 基础外设修复 --- */
 
 &hdmi0 {
     enable-gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
@@ -85,19 +89,16 @@
     rockchip,baudrate = <1500000>; /* 修正为标准 1.5M 波特率 */
 };
 
-/* 修复 USB 3.0 主机电源 (向成底板引脚) */
 &vcc5v0_host {
     gpio = <&gpio4 30 0>; 
     status = "okay";
 };
 
-/* 修复 SD 卡检测 (GPIO0_C0) */
 &sdmmc {
     cd-gpios = <&gpio0 24 1>; 
     status = "okay";
 };
 
-/* --- 网口修复 (向成底板专用复位引脚) --- */
 &gmac0 {
     snps,reset-gpio = <&gpio3 4 1>; /* GPIO3_A4 */
     snps,reset-active-low;
@@ -114,7 +115,6 @@
     status = "okay";
 };
 
-/* --- 开启 CAN0 (支持紫色模块) --- */
 &can0 {
     status = "okay";
     assigned-clocks = <&cru 406>; 
@@ -123,7 +123,6 @@
     pinctrl-0 = <&can0m0_pins>; 
 };
 
-/* --- Wi-Fi 与 蓝牙修复 (向成底板 GPIO0 组) --- */
 &wireless_wlan {
     wifi_chip_en_gpio = <&gpio0 20 0>; /* GPIO0_C4 */
     wifi_host_wake_irq = <&gpio0 10 1>; /* GPIO0_B2 */
