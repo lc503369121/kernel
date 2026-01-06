@@ -481,3 +481,13 @@
 		};
 	};
 };
+/* 开启 CAN0 接口以支持紫色模块 */
+&can0 {
+	status = "okay";
+	assigned-clocks = <&cru 406>; /* 406 是 RK3588 的 CAN0 时钟 ID */
+	assigned-clock-rates = <100000000>; 
+	pinctrl-names = "default";
+	/* 向成底板通常使用 m0 映射 */
+	pinctrl-0 = <&can0m0_pins>; 
+};
+
