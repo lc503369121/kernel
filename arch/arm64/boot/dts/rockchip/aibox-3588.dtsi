@@ -74,8 +74,12 @@
 /delete-node/ &usbc0;
 
 &usbdrd_dwc3_0 {
-	status = "okay";
-	dr_mode = "otg";
+    status = "okay";
+    dr_mode = "host"; 
+};
+/delete-node/ &usbc0_int;
+/delete-node/ &usb3_host0_typec0_sw;
+
 };
 
 &u2phy0 {
@@ -211,7 +215,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&usbc0_int>;
 		vbus-supply = <&vbus5v0_typec_pwr_en>;
-		status = "okay";
+		status = "disabled";
 
 		ports {
 			#address-cells = <1>;
@@ -338,7 +342,6 @@
 };
 
 &gmac1 {
-    /* 核心修改：根据原理图校准复位引脚 */
     snps,reset-gpio = <&gpio3 5 1>; 
     snps,reset-active-low;
     snps,reset-delays-us = <0 20000 100000>;
@@ -447,17 +450,19 @@
 		};
 	};
 
-	&wireless_wlan {
-    wifi_chip_en_gpio = <&gpio0 20 0>; 
-    wifi_host_wake_irq = <&gpio0 10 1>; 
+&wireless_wlan {
+    wifi_chip_en_gpio = <&gpio0 20 0>; /* GPIO0_C4 */
+    wifi_host_wake_irq = <&gpio0 10 1>; /* GPIO0_B2 */
     status = "okay";
 };
+
 &wireless_bluetooth {
-    bt_reset_gpio = <&gpio0 22 0>; 
-    bt_wake_gpio = <&gpio0 21 0>;  
-    bt_irq_gpio = <&gpio0 0 1>;    
+    bt_reset_gpio = <&gpio0 22 0>; /* GPIO0_C6 */
+    bt_wake_gpio = <&gpio0 21 0>;  /* GPIO0_C5 */
+    bt_irq_gpio = <&gpio0 0 1>;    /* GPIO0_A0 */
     status = "okay";
 };
+
 	&sdio {
     max-frequency = <150000000>;
     no-sd;
