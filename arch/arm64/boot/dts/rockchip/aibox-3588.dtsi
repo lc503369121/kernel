@@ -42,7 +42,7 @@
 /* led */
 	&firefly_leds {
     power_led: power {
-        gpios = <&gpio0 18 1>; /* 根据向成底板常用定义校准 */
+        gpios = <&gpio0 18 1>; 
     };
     user_led: user {
         gpios = <&gpio0 17 1>;
@@ -160,7 +160,7 @@
 
 //debug 115200
 &fiq_debugger{
-	rockchip,baudrate = <115200>;  /* Only 115200 and 1500000 */
+	rockchip,baudrate = <1500000>;  /* Only 115200 and 1500000 */
 };
 
 &pwm5 {
@@ -284,9 +284,9 @@
 };
 
 /* usb */
-&vcc5v0_host{
-	status = "okay";
-	gpio = <&gpio4 RK_PC6 GPIO_ACTIVE_HIGH>;  
+&vcc5v0_host 
+    gpio = <&gpio4 30 0>; 
+    status = "okay";
 };
 
 //down
@@ -296,21 +296,22 @@
 
 /* tf-card */
 &sdmmc {
-	status = "okay";
+    cd-gpios = <&gpio0 24 1>; 
+    status = "okay";
 };
+
 
 &vcc_sdcard_pwr_en{
 	gpio = <&gpio1 RK_PA7 GPIO_ACTIVE_HIGH>; 
 	status = "okay";
 };
 
-/* gmac0 - 向成 XC3588S 适配版本 */
+
 &gmac0 {
-    /* 核心修改：改为 GPIO3_A4 (即 <&gpio3 4 1>) */
 	snps,reset-gpio = <&gpio3 4 1>; 
 	snps,reset-active-low;
 	snps,reset-delays-us = <0 20000 100000>;
-	tx_delay = <0x43>; /* 建议改为 0x43 以增强信号稳定性 */
+	tx_delay = <0x43>; 
 	status = "okay";
 };
 
@@ -446,41 +447,39 @@
 		};
 	};
 
-	wireless-bluetooth {
-		uart6_gpios: uart6-gpios {
-			rockchip,pins = <1 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		bt_reset_gpio: bt-reset-gpio {
-			rockchip,pins = <0 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		bt_wake_gpio: bt-wake-gpio {
-			rockchip,pins = <0 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		bt_irq_gpio: bt-irq-gpio {
-			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-	};
-
-	wireless-wlan {
-		wifi_host_wake_irq: wifi-host-wake-irq {
-			rockchip,pins = <0 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		wifi_poweren_gpio: wifi-poweren-gpio {
-			rockchip,pins = <0 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-	};
+	&wireless_wlan {
+    wifi_chip_en_gpio = <&gpio0 20 0>; 
+    wifi_host_wake_irq = <&gpio0 10 1>; 
+    status = "okay";
 };
-/* 开启 CAN0 接口以支持紫色模块 */
+&wireless_bluetooth {
+    bt_reset_gpio = <&gpio0 22 0>; 
+    bt_wake_gpio = <&gpio0 21 0>;  
+    bt_irq_gpio = <&gpio0 0 1>;    
+    status = "okay";
+};
+	&sdio {
+    max-frequency = <150000000>;
+    no-sd;
+    no-mmc;
+    bus-width = <4>;
+    disable-wp;
+    cap-sd-highspeed;
+    cap-sdio-irq;
+    keep-power-in-suspend;
+    mmc-pwrseq = <&wifi_pwrseq>;
+    non-removable;
+    pinctrl-names = "default";
+    pinctrl-0 = <&sdiom0_pins>;  
+    status = "okay";
+};
+
+};
 &can0 {
 	status = "okay";
-	assigned-clocks = <&cru 406>; /* 406 是 RK3588 的 CAN0 时钟 ID */
+	assigned-clocks = <&cru 406>; 
 	assigned-clock-rates = <100000000>; 
 	pinctrl-names = "default";
-	/* 向成底板通常使用 m0 映射 */
 	pinctrl-0 = <&can0m0_pins>; 
 };
 
