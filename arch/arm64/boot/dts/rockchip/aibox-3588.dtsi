@@ -313,10 +313,13 @@
 	status = "okay";
 };
 
-/* gamc0 */
+/* gmac0 - 向成 XC3588S 适配版本 */
 &gmac0 {
-	snps,reset-gpio = <&gpio4 RK_PA2 GPIO_ACTIVE_LOW>;
-	tx_delay = <0x37>;
+    /* 核心修改：改为 GPIO3_A4 (即 <&gpio3 4 1>) */
+	snps,reset-gpio = <&gpio3 4 1>; 
+	snps,reset-active-low;
+	snps,reset-delays-us = <0 20000 100000>;
+	tx_delay = <0x43>; /* 建议改为 0x43 以增强信号稳定性 */
 	status = "okay";
 };
 
